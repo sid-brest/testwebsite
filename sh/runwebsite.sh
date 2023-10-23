@@ -61,4 +61,20 @@ sudo ufw --force enable   # Enable the firewall
 echo "Starting Nginx..."
 sudo systemctl start nginx
 
-echo "Website successfully deployed. You can access it at http://<server-ip>:80"
+# Retrieve IPv4 addresses
+ipv4_addresses=$(hostname -I | tr ' ' '\n')
+
+# Filter local LAN addresses starting with "192"
+server_ip=""
+for address in $ipv4_addresses; do
+    if [[ $address == 192.* ]]; then
+        server_ip=$address
+        break
+    fi
+done
+
+if [ -n "$server_ip" ]; then
+    echo "Website successfully deployed. You can access it at http://$server_ip:80"
+else
+    echo "Failed to retrieve the server IP address."
+fi
