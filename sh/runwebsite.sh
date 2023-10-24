@@ -65,16 +65,19 @@ sudo systemctl start nginx
 ipv4_addresses=$(hostname -I | tr ' ' '\n')
 
 # Filter local LAN addresses starting with "192"
-server_ip=""
+matching_addresses=()
 for address in $ipv4_addresses; do
     if [[ $address == 192.* ]]; then
-        server_ip=$address
-        break
+        matching_addresses+=("$address")
     fi
 done
 
-if [ -n "$server_ip" ]; then
-    echo "Website successfully deployed. You can access it at http://$server_ip:80"
+if [ ${#matching_addresses[@]} -gt 0 ]; then
+    # Multiple network interfaces with addresses starting with "192" are detected
+    echo "Website successfully deployed. You can access it at http://${matching_addresses[0]}:80"
+elif [ ${#ipv4_addresses[@]} -gt 0 ]; then
+    # Only one network interface is detected
+    echo "Website successfully deployed. You can access it at http://${ipv4_addresses[0]}:80"
 else
     echo "Failed to retrieve the server IP address."
 fi
