@@ -77,7 +77,17 @@ if [ ${#matching_addresses[@]} -gt 0 ]; then
     echo "Website successfully deployed. You can access it at http://${matching_addresses[0]}:80"
 elif [ ${#ipv4_addresses[@]} -gt 0 ]; then
     # Only one network interface is detected
-    echo "Website successfully deployed. You can access it at http://${ipv4_addresses[0]}:80"
+    echo "Website successfully deployed. You can access it at private http://${ipv4_addresses[0]}:80"
 else
     echo "Failed to retrieve the server IP address."
+fi
+
+# Retrieve the Public IPv4 address using AWS CLI
+public_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+
+if [ -n "$public_ip" ]; then
+    # Public IPv4 address is available
+    echo "Website successfully deployed. You can access it at public http://${public_ip}:80"
+else
+    echo "Failed to retrieve the Public IPv4 address."
 fi
